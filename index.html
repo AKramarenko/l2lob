@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L2 Donate Calculator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:#0a0a12;
+  color:#c9b87a;
+  font-family:Segoe UI,Tahoma,sans-serif;
+  font-size:15px;
+  min-height:100vh;
+  background-image:
+    radial-gradient(ellipse at 50% 0%,rgba(40,30,10,0.5) 0%,transparent 60%),
+    repeating-linear-gradient(0deg,transparent,transparent 50px,rgba(201,184,122,0.02) 50px,rgba(201,184,122,0.02) 51px);
+}
+.container{max-width:820px;margin:0 auto;padding:20px}
+h1{
+  text-align:center;font-size:26px;margin:20px 0 6px;
+  font-family:Segoe UI,Tahoma,sans-serif;
+  text-shadow:0 0 20px rgba(201,184,122,0.4),0 2px 4px rgba(0,0,0,0.8);
+  letter-spacing:2px;
+}
+.subtitle{
+  text-align:center;color:#6a6a5a;font-size:14px;
+  margin-bottom:25px;padding-bottom:15px;
+  border-bottom:1px solid rgba(201,184,122,0.15);
+}
+.bundle-box{
+  border:1px solid rgba(201,184,122,0.3);
+  background:rgba(15,15,25,0.8);
+  padding:20px;margin-bottom:20px;
+  box-shadow:inset 0 0 30px rgba(0,0,0,0.5),0 0 15px rgba(0,0,0,0.5);
+}
+.bundle-box h2{
+  font-family:Segoe UI,Tahoma,sans-serif;
+  font-size:17px;margin-bottom:15px;
+  color:#e8d9a0;
+  text-shadow:0 0 10px rgba(201,184,122,0.3);
+}
+table{width:100%;border-collapse:collapse}
+th{
+  text-align:left;padding:8px 6px;
+  border-bottom:1px solid rgba(201,184,122,0.3);
+  color:#e8d9a0;font-size:13px;
+}
+td{padding:7px 6px;border-bottom:1px solid rgba(201,184,122,0.08);font-size:14px}
+td.item-name{color:#b8a060;min-width:200px}
+td.item-qty{color:#8a8a6a;text-align:center;white-space:nowrap}
+input[type="text"]{
+  background:rgba(20,20,35,0.9);
+  border:1px solid rgba(201,184,122,0.25);
+  color:#c9b87a;
+  padding:5px 8px;font-size:14px;
+  font-family:Segoe UI,Tahoma,sans-serif;
+  width:100px;text-align:right;
+  outline:none;
+}
+input:focus{border-color:rgba(201,184,122,0.6);box-shadow:0 0 8px rgba(201,184,122,0.15)}
+.totals{
+  border:1px solid rgba(201,184,122,0.4);
+  background:rgba(20,18,10,0.9);
+  padding:20px;margin-top:20px;
+  box-shadow:inset 0 0 40px rgba(0,0,0,0.5),0 0 20px rgba(201,184,122,0.05);
+}
+.totals h2{
+  font-family:Segoe UI,Tahoma,sans-serif;
+  font-size:17px;margin-bottom:15px;color:#e8d9a0;
+}
+.total-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:9px 0;border-bottom:1px solid rgba(201,184,122,0.1);
+  font-size:15px;
+}
+.total-row:last-child{border-bottom:none}
+.total-row .label{color:#8a8a6a}
+.total-row .value{color:#e8d9a0;font-size:17px;text-shadow:0 0 10px rgba(201,184,122,0.3)}
+.total-row .value.adena{color:#f0d060}
+.total-row .value.uah{color:#60c060}
+.total-row .value.discount{color:#60a0f0}
+.reset-btn{
+  background:rgba(201,184,122,0.1);
+  border:1px solid rgba(201,184,122,0.3);
+  color:#c9b87a;padding:8px 18px;
+  font-family:Segoe UI,Tahoma,sans-serif;font-size:14px;
+  cursor:pointer;margin-top:15px;
+}
+.reset-btn:hover{background:rgba(201,184,122,0.2);border-color:rgba(201,184,122,0.5)}
+.note{font-size:12px;color:#5a5a4a;margin-top:8px}
+.suffix{color:#5a5a4a;font-size:12px;margin-left:3px}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>L2 Donate Calculator</h1>
+  <p class="subtitle">Bundle $200 / 8 854 UAH</p>
+
+  <div class="bundle-box">
+    <h2>Bundle Items</h2>
+    <table>
+      <thead>
+        <tr><th>Item</th><th>Qty</th><th>Price per item</th><th style="text-align:right">Subtotal</th></tr>
+      </thead>
+      <tbody id="itemsBody"></tbody>
+    </table>
+  </div>
+
+  <div class="totals">
+    <h2>Results</h2>
+    <div class="total-row">
+      <span class="label">Total adena</span>
+      <span class="value adena" id="totalAdena">—</span>
+    </div>
+    <div class="total-row">
+      <span class="label">1 UAH =</span>
+      <span class="value adena" id="perUah">—</span>
+    </div>
+    <div class="total-row">
+      <span class="label">1kkk adena</span>
+      <span class="value uah" id="costPerKkk">—</span>
+    </div>
+    <div class="total-row">
+      <span class="label">1kkk adena (33% off)</span>
+      <span class="value discount" id="costPerKkkDiscount">—</span>
+    </div>
+  </div>
+
+  <button class="reset-btn" onclick="resetPrices()">Reset to default prices</button>
+  <p class="note">Item prices are saved in your browser (localStorage).</p>
+</div>
+
+<script>
+const KK = 1e6;
+const KKK = 1e9;
+const BUNDLE_UAH = 8854;
+
+const DEFAULT_ITEMS = [
+  { id:"col",   name:"Coin of Luck",                          qty:2600, price:2615000,  suffix:"kk" },
+  { id:"gcp",   name:"Greater CP Potion",                     qty:5000, price:13800,     suffix:""   },
+  { id:"cp",    name:"CP Potion",                              qty:5000, price:13800,     suffix:""   },
+  { id:"itgls", name:"Improved Top-grade Life Stone",          qty:40,   price:27700000,  suffix:"kk" },
+  { id:"bseot", name:"Blessed Scroll: Enchant Olf's T-Shirt", qty:15,   price:25000000,  suffix:"kk" },
+  { id:"bsec",  name:"Blessed Scroll: Enchant Cloak",         qty:15,   price:25000000,  suffix:"kk" },
+];
+
+function multiplier(item) { return item.suffix === "kk" ? KK : 1; }
+
+function displayVal(item, raw) {
+  const m = multiplier(item);
+  return m > 1 ? (raw / m).toFixed(3).replace(/\.?0+$/, '') : raw.toString();
+}
+
+function parseVal(str, item) {
+  const n = parseFloat(str);
+  return isNaN(n) ? 0 : n * multiplier(item);
+}
+
+function formatAdena(v) {
+  if (v >= KKK) return (v / KKK).toFixed(2) + ' kkk';
+  if (v >= KK)  return (v / KK).toFixed(1) + ' kk';
+  if (v >= 1000) return (v / 1000).toFixed(1) + 'k';
+  return v.toFixed(0);
+}
+
+function loadPrices() {
+  try {
+    const s = JSON.parse(localStorage.getItem('l2lob_prices'));
+    if (s && typeof s === 'object') return s;
+  } catch(e) {}
+  return {};
+}
+
+function savePrices() {
+  const prices = {};
+  DEFAULT_ITEMS.forEach(item => {
+    const inp = document.getElementById('price_' + item.id);
+    prices[item.id] = parseVal(inp.value, item);
+  });
+  localStorage.setItem('l2lob_prices', JSON.stringify(prices));
+}
+
+function buildTable() {
+  const saved = loadPrices();
+  const tbody = document.getElementById('itemsBody');
+  tbody.innerHTML = '';
+
+  DEFAULT_ITEMS.forEach(item => {
+    const price = saved[item.id] !== undefined ? saved[item.id] : item.price;
+    const tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td class="item-name">' + item.name + '</td>' +
+      '<td class="item-qty">x' + item.qty.toLocaleString() + '</td>' +
+      '<td><input type="text" id="price_' + item.id + '" value="' + displayVal(item, price) + '">' +
+      (item.suffix ? '<span class="suffix">' + item.suffix + '</span>' : '') + '</td>' +
+      '<td id="sub_' + item.id + '" style="text-align:right;color:#e8d9a0">—</td>';
+    tbody.appendChild(tr);
+    tr.querySelector('input').addEventListener('input', function() { calc(); savePrices(); });
+  });
+
+  calc();
+}
+
+function calc() {
+  let total = 0;
+
+  DEFAULT_ITEMS.forEach(item => {
+    const inp = document.getElementById('price_' + item.id);
+    const price = parseVal(inp.value, item);
+    const sub = price * item.qty;
+    total += sub;
+    document.getElementById('sub_' + item.id).textContent = formatAdena(sub);
+  });
+
+  document.getElementById('totalAdena').textContent = formatAdena(total);
+
+  if (total > 0) {
+    const perUah = total / BUNDLE_UAH;
+    document.getElementById('perUah').textContent = formatAdena(perUah);
+
+    const uahPerKkk = BUNDLE_UAH / (total / KKK);
+    document.getElementById('costPerKkk').textContent = uahPerKkk.toFixed(2) + ' UAH';
+    document.getElementById('costPerKkkDiscount').textContent = (uahPerKkk * 0.67).toFixed(2) + ' UAH';
+  } else {
+    document.getElementById('perUah').textContent = '—';
+    document.getElementById('costPerKkk').textContent = '—';
+    document.getElementById('costPerKkkDiscount').textContent = '—';
+  }
+}
+
+function resetPrices() {
+  localStorage.removeItem('l2lob_prices');
+  buildTable();
+}
+
+buildTable();
+</script>
+</body>
+</html>
