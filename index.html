@@ -125,6 +125,12 @@ input:focus{border-color:rgba(201,184,122,0.6);box-shadow:0 0 8px rgba(201,184,1
       <span class="label">1kkk adena (33% off)</span>
       <span class="value discount" id="costPerKkkDiscount">—</span>
     </div>
+    <div class="total-row" style="margin-top:10px;border-top:1px solid rgba(201,184,122,0.2);padding-top:12px">
+      <span class="label" style="display:flex;align-items:center;gap:8px">
+        <input type="text" id="adenaInput" placeholder="0" style="width:80px"> <span class="suffix">kk adena</span> =
+      </span>
+      <span class="value uah" id="adenaToUah">—</span>
+    </div>
   </div>
 
   <button class="reset-btn" onclick="resetPrices()">Reset to default prices</button>
@@ -223,11 +229,25 @@ function calc() {
     const uahPerKkk = BUNDLE_UAH / (total / KKK);
     document.getElementById('costPerKkk').textContent = uahPerKkk.toFixed(2) + ' UAH';
     document.getElementById('costPerKkkDiscount').textContent = (uahPerKkk * 0.67).toFixed(2) + ' UAH';
+
+    calcAdenaToUah(uahPerKkk * 0.67);
   } else {
     document.getElementById('perUah').textContent = '—';
     document.getElementById('costPerKkk').textContent = '—';
     document.getElementById('costPerKkkDiscount').textContent = '—';
+    document.getElementById('adenaToUah').textContent = '—';
   }
+}
+
+function calcAdenaToUah(discountRate) {
+  const inp = document.getElementById('adenaInput');
+  const kk = parseFloat(inp.value);
+  if (isNaN(kk) || kk <= 0 || !discountRate) {
+    document.getElementById('adenaToUah').textContent = '—';
+    return;
+  }
+  const uah = (kk / 1000) * discountRate;
+  document.getElementById('adenaToUah').textContent = uah.toFixed(2) + ' UAH';
 }
 
 function resetPrices() {
@@ -236,6 +256,7 @@ function resetPrices() {
 }
 
 buildTable();
+document.getElementById('adenaInput').addEventListener('input', function() { calc(); });
 </script>
 </body>
 </html>
